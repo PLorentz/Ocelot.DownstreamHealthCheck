@@ -8,7 +8,7 @@ namespace Ocelot.DownstreamHealthCheck
 {
     internal interface IServiceHealthTracker
     {
-        void MarkHealthyCheck(string healthCheckid);
-        void MarkUnhealthyCheck(string healthCheckid);
+        void MarkHealthyCheck(string healthCheckId);
+        void MarkUnhealthyCheck(string healthCheckId);
     }
 }
