@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ocelot.DownstreamHealthCheck
+namespace Ocelot.DownstreamHealthCheck.ServiceDiscovery
 {
     internal interface IProcessDiscoveredServices
     {

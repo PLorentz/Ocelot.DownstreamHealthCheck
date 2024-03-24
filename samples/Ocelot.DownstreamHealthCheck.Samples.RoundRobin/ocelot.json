@@ -6,11 +6,34 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 5288
+          "Port": 5288,
+          "HealthCheckId": "API_1"
         },
         {
           "Host": "localhost",
-          "Port": 5062
+          "Port": 5062,
+          "HealthCheckId": "API_2"
+        }
+      ],
+      "UpstreamPathTemplate": "/weatherforecast",
+      "UpstreamHttpMethod": [ "Get" ],
+      "LoadBalancerOptions": {
+        "Type": "RoundRobin"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/weatherforecast",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5288,
+          "HealthCheckId": "API_1"
+        },
+        {
+          "Host": "localhost",
+          "Port": 5062,
+          "HealthCheckId": "API_2"
         }
       ],
       "UpstreamPathTemplate": "/weather",
@@ -22,5 +45,21 @@
   ],
   "GlobalConfiguration": {
     "BaseUrl": "https://localhost:7194"
+  },
+  "DownstreamHealthCheck": {
+    "PeriodicChecks": {
+      "Enabled": true,
+      "PeriodInSeconds": 10
+    },
+    "HealthChecks": [
+      {
+        "Id": "API_1",
+        "HealthCheckUrl": "http://localhost:5288/health"
+      },
+      {
+        "Id": "API_2",
+        "HealthCheckUrl": "http://localhost:5062/health"
+      }
+    ]
   }
 }

@@ -24,6 +24,9 @@ int callCount = 0;
 app.MapGet("/weatherforecast", () =>
 {
     ++callCount;
+
+    Console.WriteLine("Call number " + callCount);
+
     var forecast = Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
         (
@@ -36,6 +39,14 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast")
+.WithOpenApi();
+
+app.MapGet("/health", () =>
+{
+    Console.WriteLine("Health checked");
+    return true;
+})
+.WithName("GetHealth")
 .WithOpenApi();
 
 app.Run();
