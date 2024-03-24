@@ -1,4 +1,5 @@
-﻿using Ocelot.ServiceDiscovery.Providers;
+﻿using Ocelot.Configuration;
+using Ocelot.ServiceDiscovery.Providers;
 using Ocelot.Values;
 using System;
 using System.Collections.Generic;
@@ -11,11 +12,13 @@ namespace Ocelot.DownstreamHealthCheck.ServiceDiscovery
     internal class PostProcessingServiceDiscoveryProvider : IServiceDiscoveryProvider
     {
         private readonly IServiceDiscoveryProvider _serviceDiscoveryProvider;
+        private readonly DownstreamRoute _route;
         private readonly IEnumerable<IProcessDiscoveredServices> _postProcessingMethods;
 
-        public PostProcessingServiceDiscoveryProvider(IServiceDiscoveryProvider serviceDiscoveryProvider, IEnumerable<IProcessDiscoveredServices> postProcessingMethods)
+        public PostProcessingServiceDiscoveryProvider(IServiceDiscoveryProvider serviceDiscoveryProvider, DownstreamRoute route, IEnumerable<IProcessDiscoveredServices> postProcessingMethods)
         {
             _serviceDiscoveryProvider = serviceDiscoveryProvider;
+            _route = route;
             _postProcessingMethods = postProcessingMethods;
         }
 
@@ -25,7 +28,7 @@ namespace Ocelot.DownstreamHealthCheck.ServiceDiscovery
 
             foreach (var processingMethod in _postProcessingMethods)
             {
-                services = processingMethod.ProcessDiscoveredServices(services);
+                services = processingMethod.ProcessDiscoveredServices(_route, services);
             }
 
             return services;

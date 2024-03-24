@@ -1,4 +1,5 @@
-﻿using Ocelot.Values;
+﻿using Ocelot.Configuration;
+using Ocelot.Values;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace Ocelot.DownstreamHealthCheck.ServiceDiscovery
 {
     internal interface IProcessDiscoveredServices
     {
-        Task<List<Service>> ProcessDiscoveredServices(Task<List<Service>> services);
+        Task<List<Service>> ProcessDiscoveredServices(DownstreamRoute route, Task<List<Service>> services);
     }
 }

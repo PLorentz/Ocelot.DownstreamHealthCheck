@@ -42,7 +42,7 @@ namespace Ocelot.DownstreamHealthCheck.ServiceDiscovery
             }
 
             var factoryToUse = factories[factories.Length - 2];
-            return new OkResponse<IServiceDiscoveryProvider>(new PostProcessingServiceDiscoveryProvider(factoryToUse.Get(serviceConfig, route).Data, _postProcessingMethods));
+            return new OkResponse<IServiceDiscoveryProvider>(new PostProcessingServiceDiscoveryProvider(factoryToUse.Get(serviceConfig, route).Data, route, _postProcessingMethods));
         }
     }
 }

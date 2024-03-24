@@ -8,6 +8,7 @@ using Ocelot.DownstreamHealthCheck.PeriodicCheck;
 using Ocelot.DownstreamHealthCheck.ServiceDiscovery;
 using Ocelot.ServiceDiscovery;
 using System;
+using System.Linq;
 
 namespace Ocelot.DownstreamHealthCheck
 {
@@ -20,7 +21,7 @@ namespace Ocelot.DownstreamHealthCheck
 
             builder.Services
                 .AddSingleton<IProcessDiscoveredServices, ServicesHealthTracker>()
-                .AddSingleton<IServiceHealthTracker, ServicesHealthTracker>()
+                .AddSingleton<IServiceHealthTracker>(services => services.GetServices<IProcessDiscoveredServices>().OfType<IServiceHealthTracker>().Last())
                 .AddSingleton<IServiceDiscoveryProviderFactory, PostProcessingServiceDiscoveryProviderFactory>();
 
             builder.Services.AddHostedService<HealthCheckWorker>();
