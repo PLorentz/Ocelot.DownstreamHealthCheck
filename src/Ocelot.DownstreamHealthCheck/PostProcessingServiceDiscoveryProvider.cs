@@ -11,18 +11,24 @@ namespace Ocelot.DownstreamHealthCheck
     internal class PostProcessingServiceDiscoveryProvider : IServiceDiscoveryProvider
     {
         private readonly IServiceDiscoveryProvider _serviceDiscoveryProvider;
-        private readonly Func<Task<List<Service>>, Task<List<Service>>> _postProcessingFunction;
+        private readonly IEnumerable<IProcessDiscoveredServices> _postProcessingMethods;
 
-        public PostProcessingServiceDiscoveryProvider(IServiceDiscoveryProvider serviceDiscoveryProvider, Func<Task<List<Service>>, Task<List<Service>>> postProcessingFunction)
+        public PostProcessingServiceDiscoveryProvider(IServiceDiscoveryProvider serviceDiscoveryProvider, IEnumerable<IProcessDiscoveredServices> postProcessingMethods)
         {
             _serviceDiscoveryProvider = serviceDiscoveryProvider;
-            _postProcessingFunction = postProcessingFunction;
+            _postProcessingMethods = postProcessingMethods;
         }
 
         public Task<List<Service>> GetAsync()
         {
             var services = _serviceDiscoveryProvider.GetAsync();
-            return _postProcessingFunction?.Invoke(services) ?? services;
+
+            foreach (var processingMethod in _postProcessingMethods)
+            {
+                services = processingMethod.ProcessDiscoveredServices(services);
+            }
+
+            return services;
         }
     }
 }

@@ -8,7 +8,9 @@ namespace Ocelot.DownstreamHealthCheck
     {
         public static IOcelotBuilder AddDownstreamHealthCheck(this IOcelotBuilder builder)
         {
-            builder.Services.AddSingleton<IServiceDiscoveryProviderFactory, PostProcessingServiceDiscoveryProviderFactory>();
+            builder.Services
+                .AddSingleton<IProcessDiscoveredServices, DownstreamHealthTracker>()
+                .AddSingleton<IServiceDiscoveryProviderFactory, PostProcessingServiceDiscoveryProviderFactory>();
             return builder;
         }
     }

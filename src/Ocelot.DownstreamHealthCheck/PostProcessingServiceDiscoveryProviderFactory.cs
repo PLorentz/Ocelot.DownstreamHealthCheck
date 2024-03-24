@@ -17,11 +17,13 @@ namespace Ocelot.DownstreamHealthCheck
     {
         private readonly IOcelotLogger _logger;
         private readonly IServiceProvider _servicePovider;
+        private readonly IEnumerable<IProcessDiscoveredServices> _postProcessingMethods;
 
-        public PostProcessingServiceDiscoveryProviderFactory(IOcelotLoggerFactory factory, IServiceProvider serviceProvider)
+        public PostProcessingServiceDiscoveryProviderFactory(IOcelotLoggerFactory factory, IServiceProvider serviceProvider, IEnumerable<IProcessDiscoveredServices> postProcessingMethods)
         {
             _logger = factory.CreateLogger<ServiceDiscoveryProviderFactory>();
             _servicePovider = serviceProvider;
+            _postProcessingMethods = postProcessingMethods;
         }
 
         public Response<IServiceDiscoveryProvider> Get(ServiceProviderConfiguration serviceConfig, DownstreamRoute route)
@@ -36,7 +38,7 @@ namespace Ocelot.DownstreamHealthCheck
             }
 
             var factoryToUse = factories[factories.Length - 2];
-            return new OkResponse<IServiceDiscoveryProvider>(new PostProcessingServiceDiscoveryProvider(factoryToUse.Get(serviceConfig, route).Data, services => services));
+            return new OkResponse<IServiceDiscoveryProvider>(new PostProcessingServiceDiscoveryProvider(factoryToUse.Get(serviceConfig, route).Data, _postProcessingMethods));
         }
     }
 }
