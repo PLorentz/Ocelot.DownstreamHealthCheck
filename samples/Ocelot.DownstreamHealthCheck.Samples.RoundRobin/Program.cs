@@ -20,6 +20,7 @@ builder .UseKestrel()
         })
         .ConfigureLogging((hostingContext, logging) =>
         {
+            logging.AddConsole();
             //add your logging
         })
         .UseIISIntegration()
