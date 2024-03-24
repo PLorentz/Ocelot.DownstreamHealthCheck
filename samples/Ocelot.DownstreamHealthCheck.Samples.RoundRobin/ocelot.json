@@ -59,8 +59,7 @@
       },
       {
         "Id": "API_2",
-        "HealthCheckUrl": "http://localhost:5062/health",
-        "TimeOutInMilliseconds": 1000
+        "HealthCheckUrl": "http://localhost:5062/health"
       }
     ]
   }

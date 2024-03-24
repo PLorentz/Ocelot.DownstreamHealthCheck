@@ -34,7 +34,11 @@ namespace Ocelot.DownstreamHealthCheck.PeriodicCheck
                     using var client = new HttpClient();
                     try
                     {
-                        client.Timeout = TimeSpan.FromMilliseconds(healthCheck.TimeOutInMilliseconds);
+                        if (healthCheck.TimeOutInMilliseconds.HasValue)
+                        {
+                            client.Timeout = TimeSpan.FromMilliseconds(healthCheck.TimeOutInMilliseconds.Value);
+                        }
+
                         _logger.LogInformation("Checking health of " + healthCheck.Id);
                         var result = await client.GetAsync(healthCheck.HealthCheckUrl, subCancellationToken);
                         if (result.IsSuccessStatusCode)
