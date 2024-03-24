@@ -54,11 +54,13 @@
     "HealthChecks": [
       {
         "Id": "API_1",
-        "HealthCheckUrl": "http://localhost:5288/health"
+        "HealthCheckUrl": "http://localhost:5288/health",
+        "TimeOutInMilliseconds": 1000
       },
       {
         "Id": "API_2",
-        "HealthCheckUrl": "http://localhost:5062/health"
+        "HealthCheckUrl": "http://localhost:5062/health",
+        "TimeOutInMilliseconds": 1000
       }
     ]
   }

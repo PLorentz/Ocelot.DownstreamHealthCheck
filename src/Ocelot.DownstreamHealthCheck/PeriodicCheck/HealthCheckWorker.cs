@@ -25,11 +25,6 @@ namespace Ocelot.DownstreamHealthCheck.PeriodicCheck
             _healthCheckConfig = healthCheckConfig.Value;
         }
 
-        public override Task StartAsync(CancellationToken cancellationToken)
-        {
-            return base.StartAsync(cancellationToken);
-        }
-
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested && _healthCheckConfig.PeriodicChecks.Enabled)
@@ -37,11 +32,11 @@ namespace Ocelot.DownstreamHealthCheck.PeriodicCheck
                 await Parallel.ForEachAsync(_healthCheckConfig.HealthChecks, cancellationToken, async (healthCheck, subCancellationToken) =>
                 {
                     using var client = new HttpClient();
-                    HttpResponseMessage result;
                     try
                     {
+                        client.Timeout = TimeSpan.FromMilliseconds(healthCheck.TimeOutInMilliseconds);
                         _logger.LogInformation("Checking health of " + healthCheck.Id);
-                        result = await client.GetAsync(healthCheck.HealthCheckUrl, subCancellationToken);
+                        var result = await client.GetAsync(healthCheck.HealthCheckUrl, subCancellationToken);
                         if (result.IsSuccessStatusCode)
                         {
                             _healthTracker.MarkHealthyCheck(healthCheck.Id);
@@ -54,6 +49,20 @@ namespace Ocelot.DownstreamHealthCheck.PeriodicCheck
                     catch (Exception ex)
                     {
                         _healthTracker.MarkUnhealthyCheck(healthCheck.Id);
+
+                        if (ex is HttpRequestException || ex is TaskCanceledException)
+                        {
+                            _logger.LogWarning($"{ex.GetType()} when checking health of {healthCheck.Id}");
+                        }
+                        else if (ex is InvalidOperationException)
+                        {
+                            _logger.LogError($"{ex.GetType()} when checking health of {healthCheck.Id}. Check the Ocelot configuration.");
+                        }
+                        else
+                        {
+                            _logger.LogCritical($"Unexpected {ex.GetType()} when checking health of {healthCheck.Id}.");
+                            throw;
+                        }
                     }
                 });
 

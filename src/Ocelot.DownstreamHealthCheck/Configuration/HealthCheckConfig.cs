@@ -22,5 +22,6 @@ namespace Ocelot.DownstreamHealthCheck.Configuration
     {
         public string Id { get; set; }
         public string HealthCheckUrl { get; set; }
+        public int TimeOutInMilliseconds { get; set; }
     }
 }
