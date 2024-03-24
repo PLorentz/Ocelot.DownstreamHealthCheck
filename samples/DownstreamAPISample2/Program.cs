@@ -43,7 +43,12 @@ app.MapGet("/weatherforecast", () =>
 
 app.MapGet("/health", () =>
 {
-    Console.WriteLine("Health checked");
+    if (DateTime.Now.Minute % 2 == 0)
+    {
+        Console.WriteLine("Health checked - throwing exception");
+        throw new Exception("I throw during even minutes");
+    }
+    Console.WriteLine("Health checked - I sent true");
     return true;
 })
 .WithName("GetHealth")
