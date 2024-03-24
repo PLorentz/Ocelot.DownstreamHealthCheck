@@ -1,0 +1,6 @@
+@Ocelot.DownstreamHealthCheck.Samples.RoundRobin_HostAddress = http://localhost:7194
+
+GET {{Ocelot.DownstreamHealthCheck.Samples.RoundRobin_HostAddress}}/weather/
+Accept: application/json
+
+###
