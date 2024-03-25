@@ -21,7 +21,8 @@
         "Type": "RoundRobin"
       },
       "QoSOptions": {
-        "TimeoutValue": 100000
+        "TimeoutValue": 100000,
+        "DurationOfBreak": 5000
       }
     },
     {
@@ -47,11 +48,12 @@
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "https://localhost:7194"
+    "BaseUrl": "https://localhost:7194",
+    "DefaultDurationOfBreak": 10000
   },
   "DownstreamHealthCheck": {
     "PeriodicChecks": {
-      "Enabled": true,
+      "Enabled": false,
       "Period": 10000
     },
     "HealthChecks": [
@@ -62,7 +64,8 @@
       },
       {
         "Id": "API_2",
-        "HealthCheckUrl": "http://localhost:5062/health"
+        "HealthCheckUrl": "http://localhost:5062/health",
+        "TimeOut": 2000
       }
     ]
   }

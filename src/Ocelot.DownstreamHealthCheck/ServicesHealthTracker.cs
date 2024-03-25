@@ -15,14 +15,12 @@ namespace Ocelot.DownstreamHealthCheck
     {
         private readonly ConcurrentDictionary<string, DateTime> _unhealthyCheckdIds = new();
         private readonly ConcurrentDictionary<string, DateTime> _unhealthyDownstreamIds = new();
-        private readonly ILookup<string, string> _servicesByHealthCheckId;
         private readonly Dictionary<string, string> _healthCheckIdByService;
+        private readonly TimeSpan _defaultServiceTimeout;
 
         public ServicesHealthTracker(IOptions<HealthCheckConfig> healthCheckConfig, IOptions<RootOcelotConfig> ocelotConfig)
         {
-            _servicesByHealthCheckId = ocelotConfig.Value.Routes
-                .SelectMany(route => route.DownstreamHostAndPorts.Select(downstream => new { route, downstream }))
-                .ToLookup(route => route.downstream.HealthCheckId, route => GetDownstreamIdentifier(route.route, route.downstream));
+            _defaultServiceTimeout = TimeSpan.FromMilliseconds(ocelotConfig.Value.GlobalConfiguration?.DefaultDurationOfBreak ?? 5 * 60 * 1000); // 5 minutes.
 
             _healthCheckIdByService = ocelotConfig.Value.Routes
                 .SelectMany(route => route.DownstreamHostAndPorts.Select(downstream => new { route, downstream }))
@@ -58,21 +56,32 @@ namespace Ocelot.DownstreamHealthCheck
             return servicesList.Where(service =>
             {
                 var downstreamIdentifier = GetDownstreamIdentifier(route, service.HostAndPort);
-                var healthCheckId = _healthCheckIdByService[downstreamIdentifier];
-
-                if (_unhealthyDownstreamIds.TryGetValue(downstreamIdentifier, out DateTime time)){
-                    if (DateTime.UtcNow.Subtract(time) < TimeSpan.FromMilliseconds(5000))
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        ExpireBadResponse(downstreamIdentifier, time);
-                    }
-                }
-
-                return !_unhealthyCheckdIds.ContainsKey(healthCheckId);
+                return !CheckBlockedByBadResponse(route, downstreamIdentifier) && !CheckBlockedByHealthCheck(downstreamIdentifier);
             }).ToList();
+        }
+
+        private bool CheckBlockedByHealthCheck(string downstreamIdentifier)
+        {
+            var healthCheckId = _healthCheckIdByService[downstreamIdentifier];
+            return _unhealthyCheckdIds.ContainsKey(healthCheckId);
+        }
+
+        private bool CheckBlockedByBadResponse(DownstreamRoute route, string downstreamIdentifier)
+        {
+            if (_unhealthyDownstreamIds.TryGetValue(downstreamIdentifier, out DateTime time))
+            {
+                var routeTimeOut = route?.QosOptions?.DurationOfBreak;
+                if (DateTime.UtcNow.Subtract(time) < (routeTimeOut.HasValue ? TimeSpan.FromMilliseconds(routeTimeOut.Value) : _defaultServiceTimeout))
+                {
+                    return true;
+                }
+                else
+                {
+                    ExpireBadResponse(downstreamIdentifier, time);
+                }
+            }
+
+            return false;
         }
 
         private string GetDownstreamIdentifier(Configuration.Route route, Downstreamhostandport hostAndPort) => $"{route.UpstreamPathTemplate}:{hostAndPort.Host}:{hostAndPort.Port}";
