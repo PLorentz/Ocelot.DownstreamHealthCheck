@@ -31,6 +31,6 @@
     {
         public string Host { get; set; }
         public int Port { get; set; }
-        public string HealthCheckId { get; set; }
+        public string? HealthCheckId { get; set; }
     }
 }

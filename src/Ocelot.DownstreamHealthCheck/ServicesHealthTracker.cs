@@ -24,6 +24,7 @@ namespace Ocelot.DownstreamHealthCheck
 
             _healthCheckIdByService = ocelotConfig.Value.Routes
                 .SelectMany(route => route.DownstreamHostAndPorts.Select(downstream => new { route, downstream }))
+                .Where(route => !string.IsNullOrEmpty(route.downstream.HealthCheckId))
                 .ToDictionary(route => GetDownstreamIdentifier(route.route, route.downstream), route => route.downstream.HealthCheckId);
         }
 
@@ -62,8 +63,12 @@ namespace Ocelot.DownstreamHealthCheck
 
         private bool CheckBlockedByHealthCheck(string downstreamIdentifier)
         {
-            var healthCheckId = _healthCheckIdByService[downstreamIdentifier];
-            return _unhealthyCheckdIds.ContainsKey(healthCheckId);
+            if(_healthCheckIdByService.TryGetValue(downstreamIdentifier, out string healthCheckId))
+            {
+                return _unhealthyCheckdIds.ContainsKey(healthCheckId);
+            }
+
+            return false;
         }
 
         private bool CheckBlockedByBadResponse(DownstreamRoute route, string downstreamIdentifier)
