@@ -22,7 +22,9 @@
       },
       "QoSOptions": {
         "TimeoutValue": 100000,
-        "DurationOfBreak": 5000
+        "DurationOfBreak": 5000,
+        "BreakIf5XX": true,
+        "BreakIf4XX": true
       }
     },
     {

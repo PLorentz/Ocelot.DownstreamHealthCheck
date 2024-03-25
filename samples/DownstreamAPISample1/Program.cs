@@ -27,6 +27,12 @@ app.MapGet("/weatherforecast", () =>
 
     Console.WriteLine("Call number " + callCount);
 
+    if (callCount % 5 == 0)
+    {
+        Console.WriteLine("Failing...");
+        throw new Exception("I throw every 5 calls");
+    }
+
     var forecast = Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
         (
