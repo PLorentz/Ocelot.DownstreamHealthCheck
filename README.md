@@ -1,3 +1,5 @@
+NuGet package: https://www.nuget.org/packages/Ocelot.DownstreamHealthCheck/0.0.0-dev
+
 This project extends Ocelot to not consider downstream services known not to be healthy.
 Discovering unhealthy services can happens in two ways, that can be configured and enabled separately in the ocelot.json. All times are configured in milliseconds.
 
