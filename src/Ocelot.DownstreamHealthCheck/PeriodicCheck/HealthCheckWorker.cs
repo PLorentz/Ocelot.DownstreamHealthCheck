@@ -26,16 +26,16 @@ namespace Ocelot.DownstreamHealthCheck.PeriodicCheck
         {
             while (!cancellationToken.IsCancellationRequested && _healthCheckConfig.PeriodicChecks.Enabled)
             {
-                await Task.Delay(_healthCheckConfig.PeriodicChecks.PeriodInSeconds * 1000, cancellationToken);
+                await Task.Delay(_healthCheckConfig.PeriodicChecks.Period, cancellationToken);
 
                 await Parallel.ForEachAsync(_healthCheckConfig.HealthChecks, cancellationToken, async (healthCheck, subCancellationToken) =>
                 {
                     using var client = new HttpClient();
                     try
                     {
-                        if (healthCheck.TimeOutInMilliseconds.HasValue)
+                        if (healthCheck.TimeOut.HasValue)
                         {
-                            client.Timeout = TimeSpan.FromMilliseconds(healthCheck.TimeOutInMilliseconds.Value);
+                            client.Timeout = TimeSpan.FromMilliseconds(healthCheck.TimeOut.Value);
                         }
 
                         _logger.LogInformation("Checking health of " + healthCheck.Id);

@@ -52,13 +52,13 @@
   "DownstreamHealthCheck": {
     "PeriodicChecks": {
       "Enabled": true,
-      "PeriodInSeconds": 10
+      "Period": 10000
     },
     "HealthChecks": [
       {
         "Id": "API_1",
         "HealthCheckUrl": "http://localhost:5288/health",
-        "TimeOutInMilliseconds": 1000
+        "TimeOut": 1000
       },
       {
         "Id": "API_2",

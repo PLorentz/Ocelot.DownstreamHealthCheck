@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ocelot.DownstreamHealthCheck.Configuration
+﻿namespace Ocelot.DownstreamHealthCheck.Configuration
 {
     internal class HealthCheckConfig
     {
@@ -15,13 +9,13 @@ namespace Ocelot.DownstreamHealthCheck.Configuration
     public class PeriodicChecks
     {
         public bool Enabled { get; set; }
-        public int PeriodInSeconds { get; set; }
+        public int Period { get; set; }
     }
 
     public class HealthCheck
     {
         public string Id { get; set; }
         public string HealthCheckUrl { get; set; }
-        public int? TimeOutInMilliseconds { get; set; }
+        public int? TimeOut { get; set; }
     }
 }
