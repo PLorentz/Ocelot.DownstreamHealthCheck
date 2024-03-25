@@ -3,10 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ocelot.DownstreamHealthCheck.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,6 +26,8 @@ namespace Ocelot.DownstreamHealthCheck.PeriodicCheck
         {
             while (!cancellationToken.IsCancellationRequested && _healthCheckConfig.PeriodicChecks.Enabled)
             {
+                await Task.Delay(_healthCheckConfig.PeriodicChecks.PeriodInSeconds * 1000, cancellationToken);
+
                 await Parallel.ForEachAsync(_healthCheckConfig.HealthChecks, cancellationToken, async (healthCheck, subCancellationToken) =>
                 {
                     using var client = new HttpClient();
@@ -69,8 +68,6 @@ namespace Ocelot.DownstreamHealthCheck.PeriodicCheck
                         }
                     }
                 });
-
-                await Task.Delay(_healthCheckConfig.PeriodicChecks.PeriodInSeconds * 1000, cancellationToken);
             }
         }
     }

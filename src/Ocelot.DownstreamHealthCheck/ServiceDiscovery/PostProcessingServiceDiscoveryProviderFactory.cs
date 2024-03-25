@@ -1,17 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Ocelot.Configuration;
-using Ocelot.DownstreamHealthCheck.Configuration;
 using Ocelot.Logging;
 using Ocelot.Responses;
 using Ocelot.ServiceDiscovery;
-using Ocelot.ServiceDiscovery.Configuration;
 using Ocelot.ServiceDiscovery.Providers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ocelot.DownstreamHealthCheck.ServiceDiscovery
 {
@@ -20,18 +15,18 @@ namespace Ocelot.DownstreamHealthCheck.ServiceDiscovery
         private readonly IOcelotLogger _logger;
         private readonly IServiceProvider _servicePovider;
         private readonly IEnumerable<IProcessDiscoveredServices> _postProcessingMethods;
-        private readonly IOptions<RootOcelotConfig> _config;
 
-        public PostProcessingServiceDiscoveryProviderFactory(IOcelotLoggerFactory factory, IServiceProvider serviceProvider, IEnumerable<IProcessDiscoveredServices> postProcessingMethods, IOptions<RootOcelotConfig> config)
+        public PostProcessingServiceDiscoveryProviderFactory(IOcelotLoggerFactory factory, IServiceProvider serviceProvider, IEnumerable<IProcessDiscoveredServices> postProcessingMethods)
         {
             _logger = factory.CreateLogger<ServiceDiscoveryProviderFactory>();
             _servicePovider = serviceProvider;
             _postProcessingMethods = postProcessingMethods;
-            _config = config;
         }
 
         public Response<IServiceDiscoveryProvider> Get(ServiceProviderConfiguration serviceConfig, DownstreamRoute route)
         {
+            _servicePovider.GetService<HealthCheckLocator>();
+
             var factories = _servicePovider.GetServices<IServiceDiscoveryProviderFactory>().ToArray();
             if (factories.Length < 2)
             {

@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using Ocelot.Configuration;
 using Ocelot.DependencyInjection;
 using Ocelot.DownstreamHealthCheck.Configuration;
 using Ocelot.DownstreamHealthCheck.PeriodicCheck;
 using Ocelot.DownstreamHealthCheck.ServiceDiscovery;
+using Ocelot.Logging;
+using Ocelot.Requester;
 using Ocelot.ServiceDiscovery;
-using System;
 using System.Linq;
+using System.Net.Http;
 
 namespace Ocelot.DownstreamHealthCheck
 {
@@ -20,13 +21,18 @@ namespace Ocelot.DownstreamHealthCheck
             builder.Services.Configure<HealthCheckConfig>(builder.Configuration.GetSection("DownstreamHealthCheck"));
 
             builder.Services
-                .AddSingleton<IProcessDiscoveredServices, ServicesHealthTracker>()
-                .AddSingleton<IServiceHealthTracker>(services => services.GetServices<IProcessDiscoveredServices>().OfType<IServiceHealthTracker>().Last())
-                .AddSingleton<IServiceDiscoveryProviderFactory, PostProcessingServiceDiscoveryProviderFactory>();
+                .AddSingleton<IServiceHealthTracker, ServicesHealthTracker>()
+                .AddSingleton<IProcessDiscoveredServices>(services => services.GetServices<IServiceHealthTracker>().OfType<IProcessDiscoveredServices>().Last())
+                .AddSingleton<IServiceDiscoveryProviderFactory, PostProcessingServiceDiscoveryProviderFactory>()
+                .AddSingleton<HealthCheckLocator>()
+                .AddSingleton((QosDelegatingHandlerDelegate)GetDelegatingHandler);
 
-            builder.Services.AddHostedService<HealthCheckWorker>();
+            builder.Services.AddHostedService<HealthCheckWorker>(); 
 
             return builder;
         }
+
+        internal static DelegatingHandler GetDelegatingHandler(DownstreamRoute route, IHttpContextAccessor contextAccessor, IOcelotLoggerFactory loggerFactory)
+        => new BadResponseDelegatingHandler(route, contextAccessor, loggerFactory);
     }
 }

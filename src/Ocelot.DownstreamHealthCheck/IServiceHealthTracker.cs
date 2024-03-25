@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ocelot.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,5 +11,6 @@ namespace Ocelot.DownstreamHealthCheck
     {
         void MarkHealthyCheck(string healthCheckId);
         void MarkUnhealthyCheck(string healthCheckId);
+        void MarkBadResponse(DownstreamRoute route, Uri requestUri);
     }
 }
