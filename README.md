@@ -107,3 +107,5 @@ Example:
 }
 
 ```
+
+Example with the two options here: [samples/Ocelot.DownstreamHealthCheck.Samples.RoundRobin/ocelot.json](samples/Ocelot.DownstreamHealthCheck.Samples.RoundRobin/ocelot.json)
